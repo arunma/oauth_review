@@ -1,0 +1,6 @@
+oauthlib
+flask
+pyopenssl
+cryptography
+pyjwt
+requests

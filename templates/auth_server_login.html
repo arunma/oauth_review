@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Login to Auth server for client {{client_id}}</title>
+    <form action="/login" method="post">
+        <p>Username:</p>
+        <input type="text" name="username" placeholder="Username">
+        <p>Password:</p>
+        <input type="password" name="password" placeholder="Password">
+
+        <input type="hidden" name="client_id" value="{{client_id}}">
+        <input type="hidden" name="redirect_url" value="{{redirect_url}}">
+        <p>
+            <input type="submit" value="Login">
+        </p>
+    </form>
+</head>
+<body>
+
+</body>
+</html>
