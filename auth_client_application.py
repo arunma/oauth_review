@@ -1,3 +1,5 @@
+import base64
+import hashlib
 import json
 
 import requests
@@ -7,17 +9,21 @@ auth_codes = {}
 
 app = Flask(__name__)
 
-auth_server_url = "http://localhost:3001"
-client_url = "http://localhost:3000"
+AUTH_SERVER_URL = "http://localhost:3001"
+CLIENT_URL = "http://localhost:3000"
+CODE_VERIFIER = "strange_times"
 
 
 @app.route("/login")
 def login():
+    code_challenge = generate_code_challenge(CODE_VERIFIER)
+    print("Codddeeee", code_challenge)
     return render_template(
         "client_login.html",
-        auth_server_endpoint=f"{auth_server_url}/auth",
+        auth_server_endpoint=f"{AUTH_SERVER_URL}/auth",
         client_id="recon_server",
-        redirect_url=f"{client_url}/callback",
+        redirect_url=f"{CLIENT_URL}/callback",
+        code_challenge=code_challenge,
     )
 
 
@@ -26,13 +32,14 @@ def callback():
     auth_code = request.args.get("authorization_code")
 
     response = requests.post(
-        f"{auth_server_url}/token",
+        f"{AUTH_SERVER_URL}/token",
         data={
             "grant_type": "authorization_code",
             "authorization_code": auth_code,
             "client_id": "recon_server",
             "client_secret": "recon_super_secret",
             "redirect_url": "http://localhost:3000/callback",
+            "code_verifier": CODE_VERIFIER,
         },
     )
 
@@ -48,6 +55,16 @@ def callback():
 @app.route("/success")
 def success():
     return "Success"
+
+
+def generate_code_challenge(code_verifier):
+    h = hashlib.sha256()
+    h.update(code_verifier.encode())
+    code_challenge = (
+        base64.b64encode(h.digest()).decode("utf-8").replace("=", "").replace("+", "")
+    )
+    print("Code challenge ", code_challenge)
+    return code_challenge
 
 
 if __name__ == "__main__":
